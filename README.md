@@ -67,22 +67,22 @@ Quick Reference 表变化：
 
 ## 效果对比 / Before & After
 
-以双栏学术论文 [Statistical Region Merging (PAMI 2004)](https://ieeexplore.ieee.org/document/1262169) 为例：
+以一篇双栏学术论文（7 页，含大量公式、表格、图片）实测为例：
 
 | 维度 | pypdf | MinerU |
 |---|---|---|
-| 文字 | 双栏顺序混乱 | ✅ 正确阅读顺序 |
-| 公式 | `\mathrm{Pr}(f(\mathbf{X})-\mu\geq\tau)` 散落 | ✅ LaTeX 公式完整保留 |
-| 表格 | 文本流拼接 | ✅ HTML 结构化表格 |
-| 图片 | 无法提取 | ✅ 21 张图片 + bbox 坐标 + 图注 |
-| 耗时 | <1 秒 | ~3 分钟 |
-| 输出 | 纯文本 | Markdown + JSON + 图片 |
+| 文字 | 双栏顺序混乱，碎片化 | ✅ 正确阅读顺序 |
+| 公式 | LaTeX 源码散落、格式错乱 | ✅ 结构化 LaTeX 公式完整保留 |
+| 表格 | 文本流拼接，行列错位 | ✅ HTML 结构化表格 |
+| 图片 | 无法提取 | ✅ 21 张图片 + 精确 bbox 坐标 + 图注文字 |
+| 耗时 | <1 秒 | ~3 分钟（首次需下载模型） |
+| 输出 | 纯文本字符串 | Markdown + JSON + 图片 |
 
-**MinerU 输出后可以用 pandoc 一键转 docx，公式自动变 Word 原生公式。**
+> 实测过程与本仓库的 diff 修改一一对应，MinerU 输出可直接用 pandoc 转为 Word（公式自动渲染为 Word 原生公式）。
 
 ---
 
-## 修改步骤 / How to Replicate
+## 使用方法 / How to Use
 
 ### 1. 安装 MinerU
 
@@ -90,67 +90,16 @@ Quick Reference 表变化：
 pip install "mineru[pipeline]"
 ```
 
-### 2. 找到 pdf skill 文件
+### 2. 替换官方 SKILL.md
 
-如果你已安装官方文档四件套，skill 文件在：
-
-```
-C:\Users\<用户名>\.claude\plugins\marketplaces\anthropic-agent-skills\skills\pdf\SKILL.md
-```
-
-如果是通过 marketplace 安装的，缓存也需要同步：
+用本仓库的 `pdf-SKILL-modified.md` 覆盖官方 pdf skill 文件：
 
 ```
-C:\Users\<用户名>\.claude\plugins\cache\anthropic-agent-skills\document-skills\<hash>\skills\pdf\SKILL.md
+skills/pdf/SKILL.md          # 主文件
+cache/.../skills/pdf/SKILL.md # 缓存（如有，同步覆盖）
 ```
 
-### 3. 修改 SKILL.md
-
-修改三个位置：
-
-**a) Overview 里加入 MinerU 优先声明（替换原有提取逻辑）**
-
-```markdown
-### Content Extraction → Always MinerU
-
-**All PDF content extraction (text, tables, formulas, images) goes through MinerU.**
-
-```bash
-mineru -p document.pdf -o output/ -b pipeline
-
-# Output:
-#   auto/*.md                — structured Markdown (LaTeX formulas, HTML tables)
-#   auto/*_content_list.json — per-element metadata (type, bbox, caption, page_idx)
-#   auto/images/             — extracted images
-```
-
-All editing operations (merge, split, watermark, forms, encrypt) use the pypdf/qpdf sections below.
-```
-
-**b) 把 pdfplumber Text/Table Extraction 部分换成 MinerU**
-
-```markdown
-### Text/Table/Image Extraction → MinerU (Preferred)
-
-**Use MinerU for all content extraction.** It handles complex layouts (multi-column), 
-formulas (→ LaTeX), tables (→ HTML), scanned PDFs (→ OCR), and extracts images with 
-position metadata (bbox, page_idx, caption).
-```
-
-**c) Quick Reference 表第一行改为 MinerU**
-
-```markdown
-| Extract text/tables/formulas/images | **MinerU** | `mineru -p doc.pdf -o output/` |
-```
-
-去掉 pdfplumber 提取、pytesseract OCR 等行，保留 pypdf/qpdf 编辑相关行。
-
-### 4. 同步缓存 + 重启 Claude Code
-
-```bash
-cp skills/pdf/SKILL.md cache/.../skills/pdf/SKILL.md
-# 重启 Claude Code
-```
+### 3. 重启 Claude Code
 
 ---
 
