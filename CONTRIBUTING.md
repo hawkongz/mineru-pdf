@@ -6,7 +6,7 @@ Thanks for your interest in improving this skill!
 
 ### Reporting Problems
 
-Found a bug or have a suggestion? [Open an issue](https://github.com/20kiki/mineru-enhance-pdf-skill/issues) and choose the appropriate template.
+Found a bug or have a suggestion? [Open an issue](https://github.com/20kiki/mineru-pdf/issues) and choose the appropriate template.
 
 ### Improving the Skill
 

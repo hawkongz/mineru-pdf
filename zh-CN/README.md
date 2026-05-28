@@ -5,7 +5,7 @@
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
   [![Platform](https://img.shields.io/badge/Platform-Claude%20Code-blue)](https://code.claude.com)
-  [![Stars](https://img.shields.io/github/stars/20kiki/mineru-enhance-pdf-skill)](https://github.com/20kiki/mineru-enhance-pdf-skill)
+  [![Stars](https://img.shields.io/github/stars/20kiki/mineru-pdf)](https://github.com/20kiki/mineru-pdf)
 
   <p><strong>Language:</strong> <a href="../README.md">English</a> | <a href="README.md">简体中文</a></p>
 </div>
