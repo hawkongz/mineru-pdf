@@ -1,0 +1,179 @@
+warning: in the working copy of 'pdf-SKILL-original.md', LF will be replaced by CRLF the next time Git touches it
+diff --git a/pdf-SKILL-original.md b/pdf-SKILL-modified.md
+index d3e046a..7eac600 100644
+--- a/pdf-SKILL-original.md
++++ b/pdf-SKILL-modified.md
+@@ -10,19 +10,44 @@ license: Proprietary. LICENSE.txt has complete terms
+ 
+ This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
+ 
++### Content Extraction → Always MinerU
++
++**All PDF content extraction (text, tables, formulas, images) goes through MinerU.** No exception, no pre-judgment.
++
++```bash
++mineru -p document.pdf -o output/ -b pipeline
++
++# Output:
++#   auto/*.md                — structured Markdown (LaTeX formulas, HTML tables)
++#   auto/*_content_list.json — per-element metadata (type, bbox, caption, page_idx)
++#   auto/images/             — extracted images
++```
++
++After extraction, read `auto/*.md` for content, `auto/*_content_list.json` for positional metadata.
++
++All editing operations (merge, split, watermark, forms, encrypt) use the pypdf/qpdf sections below.
++
+ ## Quick Start
+ 
++### Content Extraction (text/tables/formulas/images) → MinerU
++
++```bash
++# Fast pipeline mode — handles complex layouts, formulas, tables, scanned PDFs
++mineru -p document.pdf -o output/
++
++# Output contains:
++#   auto/*.md          — structured Markdown with LaTeX formulas
++#   auto/*_content_list.json — per-element metadata (text/table/image with bbox, caption, page_idx)
++#   auto/images/       — all extracted images
++```
++
++### PDF Editing (merge/split/rotate/watermark/forms/encrypt) → pypdf/qpdf
++
+ ```python
+ from pypdf import PdfReader, PdfWriter
+ 
+-# Read a PDF
+ reader = PdfReader("document.pdf")
+ print(f"Pages: {len(reader.pages)}")
+-
+-# Extract text
+-text = ""
+-for page in reader.pages:
+-    text += page.extract_text()
+ ```
+ 
+ ## Python Libraries
+@@ -76,47 +101,16 @@ with open("rotated.pdf", "wb") as output:
+     writer.write(output)
+ ```
+ 
+-### pdfplumber - Text and Table Extraction
++### Text/Table/Image Extraction → MinerU (Preferred)
+ 
+-#### Extract Text with Layout
+-```python
+-import pdfplumber
++**Use MinerU for all content extraction.** It handles complex layouts (multi-column), formulas (→ LaTeX), tables (→ HTML), scanned PDFs (→ OCR), and extracts images with position metadata (bbox, page_idx, caption).
+ 
+-with pdfplumber.open("document.pdf") as pdf:
+-    for page in pdf.pages:
+-        text = page.extract_text()
+-        print(text)
++```bash
++mineru -p document.pdf -o output/ -b pipeline
+ ```
+ 
+-#### Extract Tables
+-```python
+-with pdfplumber.open("document.pdf") as pdf:
+-    for i, page in enumerate(pdf.pages):
+-        tables = page.extract_tables()
+-        for j, table in enumerate(tables):
+-            print(f"Table {j+1} on page {i+1}:")
+-            for row in table:
+-                print(row)
+-```
++After extraction, read `auto/*.md` for structured content, `auto/*_content_list.json` for per-element metadata.
+ 
+-#### Advanced Table Extraction
+-```python
+-import pandas as pd
+-
+-with pdfplumber.open("document.pdf") as pdf:
+-    all_tables = []
+-    for page in pdf.pages:
+-        tables = page.extract_tables()
+-        for table in tables:
+-            if table:  # Check if table is not empty
+-                df = pd.DataFrame(table[1:], columns=table[0])
+-                all_tables.append(df)
+-
+-# Combine all tables
+-if all_tables:
+-    combined_df = pd.concat(all_tables, ignore_index=True)
+-    combined_df.to_excel("extracted_tables.xlsx", index=False)
+-```
+ 
+ ### reportlab - Create PDFs
+ 
+@@ -230,23 +224,11 @@ pdftk input.pdf rotate 1east output rotated.pdf
+ 
+ ## Common Tasks
+ 
+-### Extract Text from Scanned PDFs
+-```python
+-# Requires: pip install pytesseract pdf2image
+-import pytesseract
+-from pdf2image import convert_from_path
+-
+-# Convert PDF to images
+-images = convert_from_path('scanned.pdf')
++### Extract Text from Scanned PDFs → MinerU
+ 
+-# OCR each page
+-text = ""
+-for i, image in enumerate(images):
+-    text += f"Page {i+1}:\n"
+-    text += pytesseract.image_to_string(image)
+-    text += "\n\n"
+-
+-print(text)
++```bash
++# MinerU handles scanned PDFs natively (OCR + VLM)
++mineru -p scanned.pdf -o output/ -b pipeline
+ ```
+ 
+ ### Add Watermark
+@@ -268,14 +250,17 @@ with open("watermarked.pdf", "wb") as output:
+     writer.write(output)
+ ```
+ 
+-### Extract Images
+-```bash
+-# Using pdfimages (poppler-utils)
+-pdfimages -j input.pdf output_prefix
++### Extract Images → MinerU
+ 
+-# This extracts all images as output_prefix-000.jpg, output_prefix-001.jpg, etc.
++```bash
++# MinerU extracts images with position metadata (bbox, page_idx, caption)
++mineru -p document.pdf -o output/
++# Images saved in output/auto/images/
++# Position data in output/auto/*_content_list.json
+ ```
+ 
++For bulk raw image extraction without position data, fall back to `pdfimages -j input.pdf output_prefix`.
++
+ ### Password Protection
+ ```python
+ from pypdf import PdfReader, PdfWriter
+@@ -297,14 +282,15 @@ with open("encrypted.pdf", "wb") as output:
+ 
+ | Task | Best Tool | Command/Code |
+ |------|-----------|--------------|
++| Extract text/tables/formulas/images | **MinerU** | `mineru -p doc.pdf -o output/` |
+ | Merge PDFs | pypdf | `writer.add_page(page)` |
+ | Split PDFs | pypdf | One page per file |
+-| Extract text | pdfplumber | `page.extract_text()` |
+-| Extract tables | pdfplumber | `page.extract_tables()` |
+ | Create PDFs | reportlab | Canvas or Platypus |
+ | Command line merge | qpdf | `qpdf --empty --pages ...` |
+-| OCR scanned PDFs | pytesseract | Convert to image first |
+ | Fill PDF forms | pdf-lib or pypdf (see FORMS.md) | See FORMS.md |
++| Rotate pages | pypdf | `page.rotate(90)` |
++| Add watermark | pypdf | `page.merge_page(watermark)` |
++| Password protection | pypdf | `writer.encrypt(user, owner)` |
+ 
+ ## Next Steps
+ 
