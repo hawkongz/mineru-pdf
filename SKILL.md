@@ -1,113 +1,93 @@
 ---
 name: mineru-pdf
-description: Use when the user wants high-quality content extraction from complex PDFs — academic papers with formulas, multi-column layouts, scanned PDFs, or any PDF where standard text extraction produces garbled text. Trigger when the user says "MinerU", "解析这篇论文", "提取PDF公式/图片/表格", or describes a PDF with unreadable formula output. For fast plain-text PDFs, the default pdf skill with pypdf is sufficient.
+description: >
+  High-accuracy PDF content extraction using MinerU (Shanghai AI Lab).
+  Use this whenever the user needs to extract text, formulas, tables, or images
+  from a complex PDF — especially academic papers, multi-column layouts,
+  scanned documents, or any PDF where pypdf produces garbled /Cxx formula output.
+  Trigger on: "MinerU", "解析这篇论文", "提取PDF公式", "这个PDF乱码了",
+  "扫描件OCR", "双栏PDF", or any request involving PDF formula/image extraction.
+  Even if the user doesn't say "MinerU" explicitly, suggest it when they
+  complain about garbled PDF text or need high-quality extraction.
+  For simple single-column text-only PDFs, the default pdf skill is faster.
 ---
 
-# MinerU PDF Content Extraction
+# MinerU PDF Extraction
 
 ## Overview
 
-[MinerU](https://github.com/opendatalab/MinerU) is a high-accuracy document parsing engine (Shanghai AI Lab, open source). Use it for **content extraction** from complex PDFs — formulas, tables, images, multi-column layouts, scanned documents.
+[MinerU](https://github.com/opendatalab/MinerU) is a document parsing engine that handles what pypdf/pdfplumber cannot: math formulas, reading order in multi-column layouts, image extraction with position metadata, and scanned PDFs. It runs entirely locally (no API keys, no network after model download).
 
-For PDF **editing** (merge, split, rotate, watermark, encrypt, forms), use the standard pdf skill (pypdf/qpdf/reportlab).
+This skill is for **content extraction only**. For PDF editing (merge, split, rotate, watermark, encrypt, forms), defer to the standard pdf skill.
 
-## Installation
+## Workflow
 
+### 1. Check installation
+
+```bash
+pip show mineru
+```
+
+If not installed:
 ```bash
 pip install "mineru[pipeline]"
 ```
 
-Dependencies include torch, transformers. First run auto-downloads models (~2GB, cached locally). No API keys, no network needed after initial download.
+### 2. Quick probe (optional)
 
-## Quick Start
-
-```bash
-mineru -p document.pdf -o output/ -b pipeline
-```
-
-Output in `output/<filename>/auto/`:
-
-| File | Content |
-|------|---------|
-| `*.md` | Structured Markdown with LaTeX formulas |
-| `*_content_list.json` | Per-element metadata (type, bbox, page_idx, text) |
-| `images/` | All extracted images (JPG) |
-
-## When to Use
-
-Check pypdf output first. If it looks clean, MinerU is overkill:
+Run pypdf on the first page to confirm MinerU is actually needed:
 
 ```bash
-python -c "from pypdf import PdfReader; print(PdfReader('doc.pdf').pages[0].extract_text()[:500])"
+python -c "from pypdf import PdfReader; print(PdfReader('FILE').pages[0].extract_text()[:500])"
 ```
 
-| Signal in pypdf output | Decision |
-|------------------------|----------|
-| `/Cxx` escape codes (formula garbled) | Use MinerU |
-| Math formulas, Greek letters | Use MinerU |
-| Multi-column layout (reading order broken) | Use MinerU |
-| Need images with position/caption | Use MinerU |
-| Scanned PDF (image-based, no text layer) | Use MinerU |
-| Clean text, single column, no formulas | Stick with pypdf |
+If the output is clean (no `/Cxx` codes, normal text), tell the user pypdf might be enough. If it's garbled, proceed with MinerU.
 
-## Advanced Options
+### 3. Run MinerU
 
 ```bash
-# Specify language for OCR
-mineru -p doc.pdf -o output/ -b pipeline -l en
-
-# Disable formula recognition (faster, no MFR model needed)
-mineru -p doc.pdf -o output/ -b pipeline -f False
-
-# Disable table recognition
-mineru -p doc.pdf -o output/ -b pipeline -t False
-
-# Process specific page range
-mineru -p doc.pdf -o output/ -b pipeline -s 0 -e 5
+mineru -p "FILE" -o "OUTPUT_DIR/" -b pipeline
 ```
 
-## Reading Results
+Key options (explain to user when relevant):
 
-### Markdown
+| Flag | When to use |
+|------|-------------|
+| `-l en` | Non-Chinese documents (default is `ch`) |
+| `-f False` | Skip formula recognition to save time when no formulas |
+| `-t False` | Skip table recognition when no tables |
+| `-s N -e M` | Process only a page range |
 
-```python
-with open("output/auto/doc.md", "r", encoding="utf-8") as f:
-    markdown = f.read()
+### 4. Report results
+
+After extraction completes, summarize for the user:
+
+- How many pages processed
+- Output directory and key files
+- Count of images, equations, tables extracted
+- Flag anything unusual (e.g., empty pages, missing content)
+
+## Output Structure
+
+```
+OUTPUT_DIR/<filename>/auto/
+├── <filename>.md              # Structured Markdown
+├── <filename>_content_list.json  # Element metadata
+├── <filename>_model.json      # Layout detection results
+├── <filename>_middle.json     # Intermediate processing data
+└── images/                    # Extracted images (JPG)
 ```
 
-### JSON Metadata
+The Markdown preserves document structure (headings, reading order, image references). The JSON provides per-element `type`, `bbox`, `page_idx`, and `text` — useful for downstream processing.
 
-```python
-import json
+## Performance
 
-with open("output/auto/doc_content_list.json", "r", encoding="utf-8") as f:
-    elements = json.load(f)
+First run downloads models (~2GB) from HuggingFace, cached permanently. Subsequent runs skip this step.
 
-for el in elements:
-    # type: text, image, equation, table, header, footer, page_number
-    # bbox: [x0, y0, x1, y1] in pixels
-    # page_idx: 0-based page number
-    print(f"[{el['type']}] page {el['page_idx']}: {el.get('text', '')[:100]}")
-```
+| PDF Type | ~Time |
+|----------|-------|
+| 10-page text-only | 1 min |
+| 7-page academic paper (formulas + figures) | 3 min |
+| 30-page scanned chapter | 10-15 min |
 
-### Images
-
-```python
-# Images referenced in markdown as:
-# ![](images/abc123.jpg)
-
-# JSON gives bbox + page for each image:
-for el in elements:
-    if el['type'] == 'image':
-        print(f"Image at {el['img_path']}, bbox={el['bbox']}, page={el['page_idx']}")
-```
-
-## Performance Reference
-
-| PDF Type | Pages | Time |
-|----------|-------|------|
-| Simple text-only | 10 | ~1 min |
-| Academic paper (formulas + figures) | 7 | ~3 min |
-| Scanned book chapter | 30 | ~10-15 min |
-
-First run adds model download time (~2GB, one-time).
+CPU-only environments work but are slower. A GPU speeds up layout detection and formula recognition significantly.
