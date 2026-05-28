@@ -100,6 +100,8 @@ New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\miner
 ```
 
 > 文件名必须叫 `SKILL.md`。如果已安装旧版，这个命令会直接覆盖更新。
+>
+> **如果下载失败**（国内访问 raw.githubusercontent.com 可能被墙），用浏览器打开 [SKILL.md](https://github.com/20kiki/mineru-pdf/blob/master/SKILL.md)，复制内容手动保存到上述路径。或者克隆仓库后复制：`git clone https://github.com/20kiki/mineru-pdf.git && cp mineru-pdf/SKILL.md ~/.claude/skills/mineru-pdf/`
 
 ### 第四步：使用
 

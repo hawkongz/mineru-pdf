@@ -100,6 +100,8 @@ New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\miner
 ```
 
 > The file must be named `SKILL.md`. Re-running the command will overwrite any existing version.
+>
+> **If the download fails** (common in some regions due to network restrictions), open [SKILL.md](https://github.com/20kiki/mineru-pdf/blob/master/SKILL.md) in your browser, copy the content, and save it to the path above manually. Or clone the repo and copy: `git clone https://github.com/20kiki/mineru-pdf.git && cp mineru-pdf/SKILL.md ~/.claude/skills/mineru-pdf/`
 
 ### Step 4 — Use It
 
