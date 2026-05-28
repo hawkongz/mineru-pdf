@@ -84,12 +84,17 @@ pip install "mineru[pipeline]"
 
 ### 第二步：安装 Skill
 
-将 `SKILL.md` 放到 Claude Code 的 skills 目录：
+**macOS / Linux：**
+```bash
+mkdir -p ~/.claude/skills/mineru-pdf && curl -o ~/.claude/skills/mineru-pdf/SKILL.md https://raw.githubusercontent.com/20kiki/mineru-pdf/master/SKILL.md
+```
 
-- **macOS / Linux：** `~/.claude/skills/mineru-pdf/SKILL.md`
-- **Windows：** `C:\Users\<用户名>\.claude\skills\mineru-pdf\SKILL.md`
+**Windows（PowerShell）：**
+```powershell
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\mineru-pdf"; Invoke-WebRequest -Uri "https://raw.githubusercontent.com/20kiki/mineru-pdf/master/SKILL.md" -OutFile "$env:USERPROFILE\.claude\skills\mineru-pdf\SKILL.md"
+```
 
-> 如果 `skills` 目录不存在，手动创建即可。文件名必须叫 `SKILL.md`。
+> 文件名必须叫 `SKILL.md`。如果已安装旧版，这个命令会直接覆盖更新。
 
 ### 第三步：使用
 
