@@ -73,7 +73,7 @@ pip install "mineru[pipeline]"
 
 ### 第三步：重启 Claude Code
 
-重启后，输入 `/mineru-pdf-extract` 即可激活本 skill。
+重启后，输入 `/mineru-pdf` 即可激活本 skill。
 
 首次使用时 MinerU 自动下载模型（~2GB，一次缓存）。
 
@@ -84,7 +84,7 @@ pip install "mineru[pipeline]"
 ### 使用
 
 ```bash
-/mineru-pdf-extract
+/mineru-pdf
 ```
 
 然后告诉它你的 PDF 路径和需求即可。Skill 会自动判断是否需要公式识别、OCR 等。
@@ -93,11 +93,11 @@ pip install "mineru[pipeline]"
 
 | 信号 | 建议 |
 |---|---|
-| pypdf 输出的公式是 `/Cxx` 乱码 | `/mineru-pdf-extract` |
-| PDF 有数学公式、希腊字母 | `/mineru-pdf-extract` |
-| 双栏/多栏，阅读顺序需要正确 | `/mineru-pdf-extract` |
-| 需要提取图片 + 位置信息 | `/mineru-pdf-extract` |
-| 扫描件（图片型 PDF，无文字层） | `/mineru-pdf-extract` |
+| pypdf 输出的公式是 `/Cxx` 乱码 | `/mineru-pdf` |
+| PDF 有数学公式、希腊字母 | `/mineru-pdf` |
+| 双栏/多栏，阅读顺序需要正确 | `/mineru-pdf` |
+| 需要提取图片 + 位置信息 | `/mineru-pdf` |
+| 扫描件（图片型 PDF，无文字层） | `/mineru-pdf` |
 | 纯文字、单栏、无公式 | 默认 pdf skill 更快 |
 
 ---

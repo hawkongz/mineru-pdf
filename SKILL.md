@@ -1,5 +1,5 @@
 ---
-name: mineru-pdf-extract
+name: mineru-pdf
 description: Use when the user wants high-quality content extraction from complex PDFs — academic papers with formulas, multi-column layouts, scanned PDFs, or any PDF where standard text extraction produces garbled text. Trigger when the user says "MinerU", "解析这篇论文", "提取PDF公式/图片/表格", or describes a PDF with unreadable formula output. For fast plain-text PDFs, the default pdf skill with pypdf is sufficient.
 ---
 
