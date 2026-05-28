@@ -64,21 +64,7 @@ pip install "mineru[pipeline]"
 
 > 依赖较多（torch、transformers 等），耐心等待 3-5 分钟。
 
-### 第二步：下载模型（首次必须，一次缓存）
-
-MinerU `-b pipeline` 需要 `PDF-Extract-Kit-1.0`（~2GB，含布局检测、公式识别、OCR、表格识别），下载一次永久缓存。
-
-```bash
-# 从 ModelScope 下载（国内快）
-modelscope download OpenDataLab/PDF-Extract-Kit-1.0
-
-# 或从 HuggingFace 下载
-# huggingface-cli download opendatalab/PDF-Extract-Kit-1.0
-```
-
-> 如果使用默认的 `hybrid-auto-engine` 后端，还需额外下载 `MinerU2.5-Pro-2605-1.2B`（~2.5GB）。本文默认使用 pipeline 模式，只需上面的模型。
-
-### 第三步：替换 SKILL.md
+### 第二步：替换 SKILL.md
 
 用本仓库的 `pdf-SKILL-modified.md` 替换官方 pdf skill 文件：
 
@@ -94,9 +80,9 @@ modelscope download OpenDataLab/PDF-Extract-Kit-1.0
 
 > 文件名必须叫 `SKILL.md`（Claude Code 强制要求），外层目录可以改。
 
-### 第四步：重启 Claude Code
+### 第三步：重启 Claude Code
 
-重启后 AI 处理任何 PDF 解析请求就会自动走 MinerU。
+重启后 AI 处理任何 PDF 解析请求就会自动走 MinerU。首次使用时 MinerU 会自动下载模型（~2GB，一次缓存）。
 
 ---
 
