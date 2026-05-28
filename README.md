@@ -66,17 +66,17 @@ pip install "mineru[pipeline]"
 
 ### 第二步：下载模型（首次必须，一次缓存）
 
-MinerU 需要从 ModelScope/HuggingFace 下载模型文件（~2GB），**下载后永久缓存**。
+MinerU `-b pipeline` 需要 `PDF-Extract-Kit-1.0`（~2GB，含布局检测、公式识别、OCR、表格识别），下载一次永久缓存。
 
 ```bash
-# 从 ModelScope 下载（国内更快）
+# 从 ModelScope 下载（国内快）
 modelscope download OpenDataLab/PDF-Extract-Kit-1.0
 
 # 或从 HuggingFace 下载
 # huggingface-cli download opendatalab/PDF-Extract-Kit-1.0
 ```
 
-> 这一步耗时取决于网速，通常 5-15 分钟。
+> 如果使用默认的 `hybrid-auto-engine` 后端，还需额外下载 `MinerU2.5-Pro-2605-1.2B`（~2.5GB）。本文默认使用 pipeline 模式，只需上面的模型。
 
 ### 第三步：替换 SKILL.md
 
