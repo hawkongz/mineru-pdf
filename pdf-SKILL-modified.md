@@ -8,40 +8,25 @@ license: Proprietary. LICENSE.txt has complete terms
 
 ## Overview
 
-This guide covers essential PDF processing operations using Python libraries and command-line tools. For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
+This guide covers essential PDF **editing** operations (merge, split, rotate, watermark, forms, encrypt). For all **content extraction** (text, tables, formulas, images), MinerU is the primary tool — it outperforms pypdf/pdfplumber on complex layouts, multi-column, scanned PDFs, and academic documents.
 
-### Content Extraction → Always MinerU
-
-**All PDF content extraction (text, tables, formulas, images) goes through MinerU.** No exception, no pre-judgment.
-
-```bash
-mineru -p document.pdf -o output/ -b pipeline
-
-# Output:
-#   auto/*.md                — structured Markdown (LaTeX formulas, HTML tables)
-#   auto/*_content_list.json — per-element metadata (type, bbox, caption, page_idx)
-#   auto/images/             — extracted images
-```
-
-After extraction, read `auto/*.md` for content, `auto/*_content_list.json` for positional metadata.
-
-All editing operations (merge, split, watermark, forms, encrypt) use the pypdf/qpdf sections below.
+For advanced features, JavaScript libraries, and detailed examples, see REFERENCE.md. If you need to fill out a PDF form, read FORMS.md and follow its instructions.
 
 ## Quick Start
 
-### Content Extraction (text/tables/formulas/images) → MinerU
+### Content Extraction → MinerU
 
 ```bash
-# Fast pipeline mode — handles complex layouts, formulas, tables, scanned PDFs
-mineru -p document.pdf -o output/
+# Extract text, tables, formulas, images from any PDF
+mineru -p document.pdf -o output/ -b pipeline
 
-# Output contains:
-#   auto/*.md          — structured Markdown with LaTeX formulas
-#   auto/*_content_list.json — per-element metadata (text/table/image with bbox, caption, page_idx)
-#   auto/images/       — all extracted images
+# Output:
+#   auto/*.md                — structured Markdown with LaTeX formulas
+#   auto/*_content_list.json — per-element metadata (type, bbox, caption, page_idx)
+#   auto/images/             — all extracted images
 ```
 
-### PDF Editing (merge/split/rotate/watermark/forms/encrypt) → pypdf/qpdf
+### PDF Editing → pypdf
 
 ```python
 from pypdf import PdfReader, PdfWriter
@@ -101,16 +86,19 @@ with open("rotated.pdf", "wb") as output:
     writer.write(output)
 ```
 
-### Text/Table/Image Extraction → MinerU (Preferred)
-
-**Use MinerU for all content extraction.** It handles complex layouts (multi-column), formulas (→ LaTeX), tables (→ HTML), scanned PDFs (→ OCR), and extracts images with position metadata (bbox, page_idx, caption).
+### MinerU - Text, Table, Formula & Image Extraction
 
 ```bash
+# Parse any PDF — handles complex layouts, formulas, tables, scanned PDFs
 mineru -p document.pdf -o output/ -b pipeline
+
+# Read results:
+#   auto/*.md                — structured Markdown (LaTeX for formulas, HTML for tables)
+#   auto/*_content_list.json — per-element metadata with bbox, caption, page_idx
+#   auto/images/             — extracted images
 ```
 
-After extraction, read `auto/*.md` for structured content, `auto/*_content_list.json` for per-element metadata.
-
+MinerU outperforms pdfplumber on multi-column layouts, formulas, scanned PDFs, and image position extraction. See [github.com/opendatalab/MinerU](https://github.com/opendatalab/MinerU).
 
 ### reportlab - Create PDFs
 
@@ -227,7 +215,7 @@ pdftk input.pdf rotate 1east output rotated.pdf
 ### Extract Text from Scanned PDFs → MinerU
 
 ```bash
-# MinerU handles scanned PDFs natively (OCR + VLM)
+# MinerU handles scanned PDFs natively (OCR + layout detection)
 mineru -p scanned.pdf -o output/ -b pipeline
 ```
 
@@ -253,13 +241,12 @@ with open("watermarked.pdf", "wb") as output:
 ### Extract Images → MinerU
 
 ```bash
-# MinerU extracts images with position metadata (bbox, page_idx, caption)
+# MinerU extracts images with position metadata
 mineru -p document.pdf -o output/
-# Images saved in output/auto/images/
-# Position data in output/auto/*_content_list.json
+# Images saved to output/auto/images/
+# Position data (bbox, page_idx, caption) in output/auto/*_content_list.json
 ```
-
-For bulk raw image extraction without position data, fall back to `pdfimages -j input.pdf output_prefix`.
+For bulk raw image extraction without metadata, fall back to `pdfimages -j input.pdf output_prefix`.
 
 ### Password Protection
 ```python
@@ -286,11 +273,11 @@ with open("encrypted.pdf", "wb") as output:
 | Merge PDFs | pypdf | `writer.add_page(page)` |
 | Split PDFs | pypdf | One page per file |
 | Create PDFs | reportlab | Canvas or Platypus |
-| Command line merge | qpdf | `qpdf --empty --pages ...` |
-| Fill PDF forms | pdf-lib or pypdf (see FORMS.md) | See FORMS.md |
 | Rotate pages | pypdf | `page.rotate(90)` |
 | Add watermark | pypdf | `page.merge_page(watermark)` |
 | Password protection | pypdf | `writer.encrypt(user, owner)` |
+| Command line merge | qpdf | `qpdf --empty --pages ...` |
+| Fill PDF forms | pdf-lib or pypdf (see FORMS.md) | See FORMS.md |
 
 ## Next Steps
 
