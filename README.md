@@ -42,7 +42,7 @@ Claude Code's default pdf skill relies on **pypdf + pdfplumber**. Fine for simpl
 
 **Does not replace the official pdf skill.** `mineru-pdf` is a standalone skill — use it explicitly when you need high-quality extraction.
 
-```
+```text
 Simple PDFs (plain text / single column) → default pdf skill (pypdf, sub-second)
 Complex PDFs (formulas / multi-column / scanned) → this skill (MinerU, high accuracy)
 ```
@@ -74,7 +74,12 @@ Tested on a dual-column academic paper (PAMI 2004, 7 pages, formulas and figures
 
 > **Prerequisites:** Python 3.8+, Claude Code installed
 
-### Step 1 — Install MinerU
+### Step 1 — Open terminal
+
+- **macOS / Linux:** Open Terminal
+- **Windows:** Press `Win + R`, type `powershell`, press Enter
+
+### Step 2 — Install MinerU
 
 ```bash
 pip install "mineru[pipeline]"
@@ -82,7 +87,7 @@ pip install "mineru[pipeline]"
 
 > Pulls in torch, transformers, etc. First install takes 3-5 minutes.
 
-### Step 2 — Install the Skill
+### Step 3 — Install the Skill
 
 **macOS / Linux:**
 ```bash
@@ -94,13 +99,13 @@ mkdir -p ~/.claude/skills/mineru-pdf && curl -o ~/.claude/skills/mineru-pdf/SKIL
 New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\mineru-pdf"; Invoke-WebRequest -Uri "https://raw.githubusercontent.com/20kiki/mineru-pdf/master/SKILL.md" -OutFile "$env:USERPROFILE\.claude\skills\mineru-pdf\SKILL.md"
 ```
 
-> 文件名必须叫 `SKILL.md`。如果已安装旧版，这个命令会直接覆盖更新。
+> The file must be named `SKILL.md`. Re-running the command will overwrite any existing version.
 
-### Step 3 — Use It
+### Step 4 — Use It
 
 Restart Claude Code, then:
 
-```
+```text
 /mineru-pdf extract this PDF
 ```
 
