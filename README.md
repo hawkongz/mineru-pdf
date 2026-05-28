@@ -98,7 +98,6 @@ pip install "mineru[pipeline]"
 
 - [MinerU](https://github.com/opendatalab/MinerU) — 一站式开源文档解析工具
 - [anthropics/skills](https://github.com/anthropics/skills) — Claude Code 官方 skill 合集
-- [pandoc](https://pandoc.org/) — Markdown → docx 转换（大部分 LaTeX 公式可转 Word 原生公式，少数旧式命令需手动清理）
 
 ---
 
