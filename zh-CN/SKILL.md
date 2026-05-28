@@ -31,6 +31,13 @@ pip show mineru
 pip install "mineru[pipeline]"
 ```
 
+首次运行会自动下载模型（~2 GB）。如果 HuggingFace 下载慢或被墙，切换到 ModelScope（国内镜像）：
+```bash
+export MINERU_MODEL_SOURCE=modelscope   # macOS / Linux
+$env:MINERU_MODEL_SOURCE="modelscope"   # Windows PowerShell
+```
+设为 ModelScope 后从 `modelscope.cn` 下载，国内速度快很多。这个环境变量只需在首次运行前设置一次。
+
 ### 2. 快速探测（可选）
 
 用 pypdf 提取第一页，确认是否真的需要 MinerU：

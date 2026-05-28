@@ -33,6 +33,13 @@ If not installed:
 pip install "mineru[pipeline]"
 ```
 
+First run downloads models (~2 GB). If HuggingFace is slow or blocked, switch to ModelScope (China mirror):
+```bash
+export MINERU_MODEL_SOURCE=modelscope   # macOS / Linux
+$env:MINERU_MODEL_SOURCE="modelscope"   # Windows PowerShell
+```
+This uses `modelscope.cn` instead of `huggingface.co` — significantly faster inside China. The env var only needs to be set once before the first `mineru` command.
+
 ### 2. Quick probe (optional)
 
 Run pypdf on the first page to confirm MinerU is actually needed:
