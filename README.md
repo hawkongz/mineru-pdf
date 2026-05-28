@@ -16,15 +16,14 @@
 
 ## 问题 / Problem
 
-Claude Code 官方 `pdf` skill（来自 [anthropics/skills](https://github.com/anthropics/skills)）文本提取依赖 **pypdf + pdfplumber**，遇到复杂 PDF 就跪了：
+Claude Code 官方 `pdf` skill（来自 [anthropics/skills](https://github.com/anthropics/skills)）文本提取依赖 **pypdf + pdfplumber**，在复杂文档上有明显短板：
 
-| 场景 | pypdf/pdfplumber |
+| 问题 | 实测表现 |
 |---|---|
-| 双栏论文 | 文字按物理位置拼接，阅读顺序全乱 |
-| 数学公式 | 乱码或直接丢失 |
-| 扫描件 | 完全无法识别 |
-| 表格 | 变成散落文本 |
-| 图片 | 只能提取二进制，无位置信息 |
+| 数学公式 | pypdf 提取为乱码（`PrðfðXÞ/C0 ...` 不可用） |
+| 图片 | pdfplumber/pypdf 无法提取，pdfimages 只出二进制无位置信息 |
+| 输出格式 | 纯文本，丢失文档结构（标题层级、阅读顺序、图文关联） |
+| 扫描件 | 完全依赖 pytesseract，配置繁琐且效果一般 |
 
 ---
 
@@ -67,18 +66,16 @@ Quick Reference 表变化：
 
 ## 效果对比 / Before & After
 
-以一篇双栏学术论文（7 页，含大量公式、表格、图片）实测为例：
+以一篇双栏学术论文（7 页，含大量公式、表格、图片）实测：
 
 | 维度 | pypdf | MinerU |
 |---|---|---|
-| 文字 | 双栏顺序混乱，碎片化 | ✅ 正确阅读顺序 |
-| 公式 | LaTeX 源码散落、格式错乱 | ✅ 结构化 LaTeX 公式完整保留 |
-| 表格 | 文本流拼接，行列错位 | ✅ HTML 结构化表格 |
-| 图片 | 无法提取 | ✅ 21 张图片 + 精确 bbox 坐标 + 图注文字 |
+| 公式提取 | `PrðfðXÞ/C0 /C22 /C21 /C28 Þ/C20 ...` 乱码 | `\mathrm{Pr}(f(\mathbf{X})-\mu\geq\tau) \leq ...` 可编译 LaTeX |
+| 图片提取 | 无 | ✅ 21 张图片 + bbox 坐标 + 图注文字 |
 | 耗时 | <1 秒 | ~3 分钟（首次需下载模型） |
 | 输出 | 纯文本字符串 | Markdown + JSON + 图片 |
 
-> 实测过程与本仓库的 diff 修改一一对应，MinerU 输出可直接用 pandoc 转为 Word（公式自动渲染为 Word 原生公式）。
+> 表格中的 pypdf 公式输出为实际提取结果，MinerU 公式输出也是真实解析内容。
 
 ---
 
