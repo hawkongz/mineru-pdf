@@ -1,130 +1,145 @@
-<h1 align="center">MinerU PDF Extract Skill</h1>
-<p align="center"><b>独立 skill——为 Claude Code 补充复杂 PDF 的高精度内容解析能力</b></p>
-<p align="center">A standalone skill for high-accuracy PDF content extraction: formulas, images, tables, scanned docs</p>
+<div align="center">
+  <h1>MinerU PDF</h1>
+  <p><strong>High-accuracy PDF content extraction for Claude Code — formulas, images, tables</strong></p>
+  <p>为 Claude Code 补充复杂 PDF 的高精度内容解析能力</p>
+
+  [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+  [![Platform](https://img.shields.io/badge/Platform-Claude%20Code-blue)](https://code.claude.com)
+  [![Stars](https://img.shields.io/github/stars/20kiki/mineru-enhance-pdf-skill)](https://github.com/20kiki/mineru-enhance-pdf-skill)
+
+  <p><strong>Language:</strong> <a href="README.md">English</a> | <a href="zh-CN/README.md">简体中文</a></p>
+</div>
 
 ---
 
-## 目录 / TOC
+## 📋 Table of Contents
 
-- [问题 / Problem](#问题--problem)
-- [方案 / Solution](#方案--solution)
-- [效果对比 / Before & After](#效果对比--before--after)
-- [安装教程 / Setup](#安装教程--setup)
-- [使用方式 / Usage](#使用方式--usage)
-
----
-
-## 问题 / Problem
-
-Claude Code 默认 pdf skill 依赖 **pypdf + pdfplumber**，日常够用，但复杂文档有明显短板：
-
-| 问题 | 实测表现 |
-|---|---|
-| 数学公式 | pypdf 提取为乱码（`PrðfðXÞ/C0 ...` 不可用） |
-| 图片 | pdfplumber/pypdf 无法提取，pdfimages 只出二进制无位置信息 |
-| 输出格式 | 纯文本，丢失文档结构（标题层级、阅读顺序、图文关联） |
-| 扫描件 | 完全依赖 pytesseract，配置繁琐且效果一般 |
+- [🔍 The Problem](#-the-problem)
+- [💡 Solution](#-solution)
+- [📊 Before & After](#-before--after)
+- [🚀 Quick Start](#-quick-start)
+- [📖 Usage](#-usage)
+- [📌 Topics](#-topics)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
 
 ---
 
-## 方案 / Solution
+## 🔍 The Problem
 
-**不替换官方 pdf skill。** 本仓库是一个**独立 skill**，用户显式调用时激活。
+Claude Code's default pdf skill relies on **pypdf + pdfplumber**. Fine for simple documents, but falls short on complex ones:
+
+| Scenario | What actually happens |
+|:---|:---|
+| Math formulas | pypdf outputs garbage like `PrðfðXÞ/C0 ...` — completely unusable |
+| Image extraction | pdfplumber / pypdf cannot extract images; pdfimages gives raw binaries with no position info |
+| Output format | Plain text, losing heading hierarchy, reading order, and image-caption associations |
+| Scanned PDFs | Entirely dependent on pytesseract with tedious setup and mediocre results |
+
+---
+
+## 💡 Solution
+
+**Does not replace the official pdf skill.** `mineru-pdf` is a standalone skill — use it explicitly when you need high-quality extraction.
 
 ```
-日常 PDF（纯文字、单栏） → 默认 pdf skill（pypdf，秒级）
-复杂 PDF（公式/双栏/扫描件）→ 这个 skill（MinerU，高精度）
+Simple PDFs (plain text / single column) → default pdf skill (pypdf, sub-second)
+Complex PDFs (formulas / multi-column / scanned) → this skill (MinerU, high accuracy)
 ```
 
-- 编辑操作（合并/拆分/加水印/加密）仍然走官方 pdf skill
-- 内容解析遇到公式乱码、图片提取等需求时，调用本 skill
-- 不跟官方 marketplace 更新冲突，不会被覆盖
+- Editing operations (merge, split, watermark, encrypt) stay with the official pdf skill
+- Content extraction with formulas, images, or complex layouts → this skill
+- Installed independently — won't conflict with or be overwritten by marketplace updates
+
+Powered by [MinerU](https://github.com/opendatalab/MinerU) (Shanghai AI Lab), running entirely locally — no API keys, no usage limits.
 
 ---
 
-## 效果对比 / Before & After
+## 📊 Before & After
 
-以一篇双栏学术论文（PAMI 2004, 7 页，含大量公式和图片）实测：
+Tested on a dual-column academic paper (PAMI 2004, 7 pages, formulas and figures throughout):
 
-| 维度 | pypdf | MinerU |
-|---|---|---|
-| 公式提取 | `PrðfðXÞ/C0 /C22 /C21 /C28 Þ/C20 ...` 乱码 | `\mathrm{Pr}(f(\mathbf{X})-\mu\geq\tau) \leq ...` 可编译 LaTeX |
-| 图片提取 | 无 | 21 个图片文件（13 个正文插图 + 8 个图元）+ bbox 坐标 + 图注文字 |
-| 耗时 | <1 秒 | ~3 分钟（首次需下载模型） |
-| 输出 | 纯文本字符串 | Markdown + JSON + 图片 |
+| Dimension | pypdf | MinerU |
+|:---|:---|:---|
+| Formula extraction | `PrðfðXÞ/C0 /C22 /C21 /C28 Þ/C20 ...` garbled | `\mathrm{Pr}(f(\mathbf{X})-\mu\geq\tau) \leq ...` compilable LaTeX |
+| Image extraction | None | 21 image files (13 figures + 8 elements) + bbox coordinates + captions |
+| Time | < 1 sec | ~ 3 min (first run downloads models) |
+| Output | Raw text string | Markdown + JSON + Images |
 
-> 表中数据均为本仓库实测结果，可在同论文上复现。
+> All data is from actual tests on the same paper — reproducible.
 
 ---
 
-## 安装教程 / Setup
+## 🚀 Quick Start
 
-### 第一步：安装 MinerU
+> **Prerequisites:** Python 3.8+, Claude Code installed
+
+### Step 1 — Install MinerU
 
 ```bash
 pip install "mineru[pipeline]"
 ```
 
-> 依赖 torch、transformers 等，首次安装需等待 3-5 分钟。
+> Pulls in torch, transformers, etc. First install takes 3-5 minutes.
 
-### 第二步：安装 Skill
+### Step 2 — Install the Skill
 
-将本仓库的 `SKILL.md` 放到 Claude Code 的 skills 目录，目录名建议为 `mineru-pdf`：
+Place `SKILL.md` in Claude Code's skills directory:
 
-**macOS / Linux：**
-```
-~/.claude/skills/mineru-pdf/SKILL.md
-```
+- **macOS / Linux:** `~/.claude/skills/mineru-pdf/SKILL.md`
+- **Windows:** `C:\Users\<username>\.claude\skills\mineru-pdf\SKILL.md`
 
-**Windows：**
-```
-C:\Users\<用户名>\.claude\skills\mineru-pdf\SKILL.md
-```
+> Create the `skills` directory if it doesn't exist. The file must be named `SKILL.md`.
 
-> 如果 `skills` 目录不存在，手动创建即可。外层目录名可以自定义，但文件名必须叫 `SKILL.md`。
+### Step 3 — Use It
 
-### 第三步：使用
-
-重启 Claude Code，输入：
+Restart Claude Code, then:
 
 ```
-/mineru-pdf 解析这个 PDF
+/mineru-pdf extract this PDF
 ```
 
-首次使用时会自动下载模型（~2GB，HuggingFace），之后缓存本地不再需要网络。
+On first use, MinerU auto-downloads models (~2 GB from HuggingFace), cached permanently thereafter.
 
 ---
 
-## 使用方式 / Usage
+## 📖 Usage
 
-输入 `/mineru-pdf` 后告诉它 PDF 路径和需求，skill 会自动判断是否需要公式识别、OCR 等。
+Type `/mineru-pdf` followed by your PDF path and needs. The skill auto-detects whether formula recognition, OCR, etc. are needed.
 
-### 什么时候用它
+### When to use it
 
-| 信号 | 建议 |
-|---|---|
-| pypdf 输出的公式是 `/Cxx` 乱码 | `/mineru-pdf` |
-| PDF 有数学公式、希腊字母 | `/mineru-pdf` |
-| 双栏/多栏，阅读顺序需要正确 | `/mineru-pdf` |
-| 需要提取图片 + 位置信息 | `/mineru-pdf` |
-| 扫描件（图片型 PDF，无文字层） | `/mineru-pdf` |
-| 纯文字、单栏、无公式 | 默认 pdf skill 更快 |
-
----
-
-## 补充 / Notes
-
-- MinerU **完全免费开源**（AGPL-3.0），本地运行，不消耗任何 API 额度
-- 本 skill **不影响**官方 pdf skill，两者可以共存
-- docx/xlsx/pptx 不需要 MinerU，原生库已经够准
+| Signal | Action |
+|:---|:---|
+| pypdf output has `/Cxx` escape codes | `/mineru-pdf` |
+| PDF contains math formulas, Greek letters | `/mineru-pdf` |
+| Multi-column layout — reading order matters | `/mineru-pdf` |
+| Need images with position metadata | `/mineru-pdf` |
+| Scanned PDF (image-based, no text layer) | `/mineru-pdf` |
+| Plain text, single column, no formulas | Default pdf skill is faster |
 
 ---
 
-## 相关项目 / Related
+## 📌 Topics
 
-- [MinerU](https://github.com/opendatalab/MinerU) — 上海 AI Lab 开源文档解析引擎
-- [anthropics/skills](https://github.com/anthropics/skills) — Claude Code 官方 skill 合集
+[`claude-code`](https://github.com/topics/claude-code) [`pdf-parsing`](https://github.com/topics/pdf-parsing) [`mineru`](https://github.com/topics/mineru) [`skill`](https://github.com/topics/skill) [`document-parser`](https://github.com/topics/document-parser) [`ocr`](https://github.com/topics/ocr) [`latex`](https://github.com/topics/latex)
 
 ---
 
-<p align="center"><sub>MIT License · 欢迎 PR / issue</sub></p>
+## 🤝 Contributing
+
+Issues and PRs welcome. Test changes to `SKILL.md` with at least one complex PDF in Claude Code before submitting.
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+---
+
+## 📄 License
+
+MIT — see [LICENSE](LICENSE).
+
+The [MinerU](https://github.com/opendatalab/MinerU) engine is licensed under AGPL-3.0.
+
+---
+
+<p align="center"><sub>Made with ❤️ for the Claude Code community</sub></p>

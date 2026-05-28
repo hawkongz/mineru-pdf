@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: MinerU Official Repo
+    url: https://github.com/opendatalab/MinerU
+    about: For MinerU engine issues (not skill-related), report here
+  - name: Claude Code Skills
+    url: https://github.com/anthropics/skills
+    about: Official Claude Code skill collection

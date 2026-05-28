@@ -1,0 +1,36 @@
+name: Bug Report
+description: Report a problem with the mineru-pdf skill
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: "## Bug Report"
+  - type: textarea
+    id: description
+    attributes:
+      label: What happened?
+      description: Describe the problem
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What did you expect to happen?
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+      description: |
+        1. Open Claude Code
+        2. Type `/mineru-pdf ...`
+        3. ...
+  - type: input
+    id: version
+    attributes:
+      label: MinerU version
+      description: Run `mineru --version`
+  - type: textarea
+    id: pdf_info
+    attributes:
+      label: PDF details
+      description: Pages, type (academic/scanned/text-only), does it contain formulas?
