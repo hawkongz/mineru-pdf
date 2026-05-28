@@ -64,18 +64,19 @@ pip install "mineru[pipeline]"
 
 > 依赖较多（torch、transformers 等），耐心等待 3-5 分钟。
 
-### 第二步：下载模型（首次必须）
+### 第二步：下载模型（首次必须，一次缓存）
 
-MinerU 首次运行会自动从 ModelScope/HuggingFace 下载模型文件（~2GB），**下载一次后永久缓存**，后续毫秒级启动。
-
-找任意一个 PDF 跑一次即可触发下载：
+MinerU 需要从 ModelScope/HuggingFace 下载模型文件（~2GB），**下载后永久缓存**。
 
 ```bash
-# 随便找一个 PDF，跑完后模型就下载好了
-mineru -p 任意文件.pdf -o ./test_output/ -b pipeline
+# 从 ModelScope 下载（国内更快）
+modelscope download OpenDataLab/PDF-Extract-Kit-1.0
+
+# 或从 HuggingFace 下载
+# huggingface-cli download opendatalab/PDF-Extract-Kit-1.0
 ```
 
-> 这一步耗时取决于网速，通常 5-15 分钟。看到进度条跑完就说明模型下载完成。
+> 这一步耗时取决于网速，通常 5-15 分钟。
 
 ### 第三步：替换 SKILL.md
 
@@ -111,7 +112,7 @@ mineru -p 任意文件.pdf -o ./test_output/ -b pipeline
 
 - [MinerU](https://github.com/opendatalab/MinerU) — 一站式开源文档解析工具
 - [anthropics/skills](https://github.com/anthropics/skills) — Claude Code 官方 skill 合集
-- [pandoc](https://pandoc.org/) — Markdown → docx 转换（LaTeX 公式自动变 Word 原生公式）
+- [pandoc](https://pandoc.org/) — Markdown → docx 转换（大部分 LaTeX 公式可转 Word 原生公式，少数旧式命令需手动清理）
 
 ---
 
