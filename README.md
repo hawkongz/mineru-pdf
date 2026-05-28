@@ -73,7 +73,7 @@ pip install "mineru[pipeline]"
 
 ### 第三步：重启 Claude Code
 
-重启后，当你需要解析复杂 PDF 时，直接告诉 AI "用 MinerU 解析这个 PDF" 就会激活本 skill。
+重启后，输入 `/mineru-pdf-extract` 即可激活本 skill。
 
 首次使用时 MinerU 自动下载模型（~2GB，一次缓存）。
 
@@ -81,29 +81,23 @@ pip install "mineru[pipeline]"
 
 ## 使用方式 / Usage
 
-### 显式调用
+### 使用
 
-对 Claude Code 说以下任意一句，即可激活本 skill：
+```bash
+/mineru-pdf-extract
+```
 
-| 你说的 | 场景 |
-|---|---|
-| `用 MinerU 解析这篇论文` | 学术论文，需要公式 + 图片 + 正确阅读顺序 |
-| `这个 PDF 公式乱码了，用 MinerU 提取` | pypdf 提取出 `/Cxx` 乱码 |
-| `提取这个 PDF 里的所有公式和图片` | 需要图片 + 位置信息 |
-| `这个扫描件用 MinerU 做 OCR` | 扫描版 PDF，无文字层 |
-| `帮我解析这个双栏 PDF，阅读顺序要对` | 双栏/多栏排版 |
-
-> 关键点：只要你的话里包含 **"MinerU"**，AI 就会加载本 skill，按高精度流程处理。
+然后告诉它你的 PDF 路径和需求即可。Skill 会自动判断是否需要公式识别、OCR 等。
 
 ### 什么时候用它
 
 | 信号 | 建议 |
 |---|---|
-| pypdf 输出的公式是 `/Cxx` 乱码 | 用 MinerU |
-| PDF 有数学公式、希腊字母 | 用 MinerU |
-| 双栏/多栏，阅读顺序需要正确 | 用 MinerU |
-| 需要提取图片 + 位置信息 | 用 MinerU |
-| 扫描件（图片型 PDF，无文字层） | 用 MinerU |
+| pypdf 输出的公式是 `/Cxx` 乱码 | `/mineru-pdf-extract` |
+| PDF 有数学公式、希腊字母 | `/mineru-pdf-extract` |
+| 双栏/多栏，阅读顺序需要正确 | `/mineru-pdf-extract` |
+| 需要提取图片 + 位置信息 | `/mineru-pdf-extract` |
+| 扫描件（图片型 PDF，无文字层） | `/mineru-pdf-extract` |
 | 纯文字、单栏、无公式 | 默认 pdf skill 更快 |
 
 ---
