@@ -9,8 +9,7 @@
 - [问题 / Problem](#问题--problem)
 - [方案 / Solution](#方案--solution)
 - [效果对比 / Before & After](#效果对比--before--after)
-- [修改步骤 / How to Replicate](#修改步骤--how-to-replicate)
-- [最终 SKILL.md / Final SKILL.md](#最终-skillmd--final-skillmd)
+- [小白教程 / Step-by-Step](#小白教程--step-by-step)
 
 ---
 
@@ -31,36 +30,12 @@ Claude Code 官方 `pdf` skill（来自 [anthropics/skills](https://github.com/a
 
 **内容解析全部交给 [MinerU](https://github.com/opendatalab/MinerU)**（上海 AI Lab 开源的文档解析引擎），编辑操作（合并/拆分/加水印/加密）继续用 pypdf/qpdf。
 
-修改只有一个原则：
-
 ```
 解析 PDF → 无脑 MinerU
 编辑 PDF → pypdf/qpdf
 ```
 
-修改后的 SKILL.md 核心变化：
-
-```diff
-- ## Quick Start
-- reader = PdfReader("document.pdf")
-- text = page.extract_text()    # ← pypdf
-+ ## Quick Start
-+ ### Content Extraction → Always MinerU
-+ mineru -p document.pdf -o output/ -b pipeline
-+
-+ ### PDF Editing → pypdf/qpdf
-+ # (unchanged: merge, split, watermark, forms, encrypt)
-```
-
-Quick Reference 表变化：
-
-| 任务 | 之前 | 之后 |
-|---|---|---|
-| Extract text | pdfplumber | **MinerU** |
-| Extract tables | pdfplumber | **MinerU** |
-| OCR scanned PDFs | pytesseract | **MinerU** |
-| Extract images | pdfimages | **MinerU**（含 bbox/caption/page_idx） |
-| Merge / Split / Rotate / Watermark | pypdf/qpdf | pypdf/qpdf（不变） |
+就这么简单。完整改动见 [pdf-SKILL-modified.md](pdf-SKILL-modified.md)，diff 见 [SKILL-diff.patch](SKILL-diff.patch)。
 
 ---
 
@@ -79,33 +54,56 @@ Quick Reference 表变化：
 
 ---
 
-## 使用方法 / How to Use
+## 小白教程 / Step-by-Step
 
-### 1. 安装 MinerU
+### 第一步：安装 MinerU
 
 ```bash
 pip install "mineru[pipeline]"
 ```
 
-### 2. 替换官方 SKILL.md
+> 依赖较多（torch、transformers 等），耐心等待 3-5 分钟。
 
-用本仓库的 `pdf-SKILL-modified.md` 覆盖官方 pdf skill 文件：
+### 第二步：下载模型（首次必须）
 
+MinerU 首次运行会自动从 ModelScope/HuggingFace 下载模型文件（~2GB），**下载一次后永久缓存**，后续毫秒级启动。
+
+找任意一个 PDF 跑一次即可触发下载：
+
+```bash
+# 随便找一个 PDF，跑完后模型就下载好了
+mineru -p 任意文件.pdf -o ./test_output/ -b pipeline
 ```
-skills/pdf/SKILL.md          # 主文件
-cache/.../skills/pdf/SKILL.md # 缓存（如有，同步覆盖）
+
+> 这一步耗时取决于网速，通常 5-15 分钟。看到进度条跑完就说明模型下载完成。
+
+### 第三步：替换 SKILL.md
+
+用本仓库的 `pdf-SKILL-modified.md` 替换官方 pdf skill 文件：
+
+**主文件：**
+```
+<Claude Code 安装目录>\plugins\marketplaces\anthropic-agent-skills\skills\pdf\SKILL.md
 ```
 
-### 3. 重启 Claude Code
+**缓存文件（如有，同步替换）：**
+```
+<Claude Code 安装目录>\plugins\cache\anthropic-agent-skills\document-skills\<hash>\skills\pdf\SKILL.md
+```
+
+> 文件名必须叫 `SKILL.md`（Claude Code 强制要求），外层目录可以改。
+
+### 第四步：重启 Claude Code
+
+重启后 AI 处理任何 PDF 解析请求就会自动走 MinerU。
 
 ---
 
 ## 补充 / Notes
 
 - MinerU **完全免费开源**（AGPL-3.0），本地运行，不消耗任何 API 额度
-- 第一次运行会下载模型（~2GB，从 ModelScope/HuggingFace），后续秒启动
 - 仅 pdf skill 值得这样改——docx/xlsx/pptx 本身是结构化格式，原生库已经够准
-- 如果官方 marketplace 更新覆盖了你的修改，重新改一次即可（改动量很小）
+- 如果官方 marketplace 更新覆盖了你的修改，重新替换 SKILL.md 即可（一行命令）
 
 ---
 
