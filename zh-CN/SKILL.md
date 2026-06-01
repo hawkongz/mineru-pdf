@@ -38,17 +38,7 @@ $env:MINERU_MODEL_SOURCE="modelscope"   # Windows PowerShell
 ```
 设为 ModelScope 后从 `modelscope.cn` 下载，国内速度快很多。这个环境变量只需在首次运行前设置一次。
 
-### 2. 快速探测（可选）
-
-用 pypdf 提取第一页，确认是否真的需要 MinerU：
-
-```bash
-python -c "from pypdf import PdfReader; print(PdfReader('文件路径').pages[0].extract_text()[:500])"
-```
-
-如果输出干净（无 `/Cxx` 乱码、文字正常），告诉用户 pypdf 可能够用。如果乱码，继续下一步。
-
-### 3. 运行 MinerU
+### 2. 运行 MinerU
 
 ```bash
 mineru -p "文件路径" -o "输出目录/" -b pipeline
@@ -63,7 +53,7 @@ mineru -p "文件路径" -o "输出目录/" -b pipeline
 | `-t False` | 无表格时跳过表格识别 |
 | `-s N -e M` | 只处理指定页码范围 |
 
-### 4. 报告结果
+### 3. 报告结果
 
 提取完成后，向用户总结：
 

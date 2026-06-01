@@ -40,17 +40,7 @@ $env:MINERU_MODEL_SOURCE="modelscope"   # Windows PowerShell
 ```
 This uses `modelscope.cn` instead of `huggingface.co` — significantly faster inside China. The env var only needs to be set once before the first `mineru` command.
 
-### 2. Quick probe (optional)
-
-Run pypdf on the first page to confirm MinerU is actually needed:
-
-```bash
-python -c "from pypdf import PdfReader; print(PdfReader('FILE').pages[0].extract_text()[:500])"
-```
-
-If the output is clean (no `/Cxx` codes, normal text), tell the user pypdf might be enough. If it's garbled, proceed with MinerU.
-
-### 3. Run MinerU
+### 2. Run MinerU
 
 ```bash
 mineru -p "FILE" -o "OUTPUT_DIR/" -b pipeline
@@ -65,7 +55,7 @@ Key options (explain to user when relevant):
 | `-t False` | Skip table recognition when no tables |
 | `-s N -e M` | Process only a page range |
 
-### 4. Report results
+### 3. Report results
 
 After extraction completes, summarize for the user:
 
