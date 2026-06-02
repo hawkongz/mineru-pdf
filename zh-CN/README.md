@@ -5,7 +5,7 @@
 
   [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](../LICENSE)
   [![Platform](https://img.shields.io/badge/Platform-Claude%20Code-blue)](https://code.claude.com)
-  [![Stars](https://img.shields.io/github/stars/20kiki/mineru-pdf)](https://github.com/20kiki/mineru-pdf)
+  [![Stars](https://img.shields.io/github/stars/hawkongz/mineru-pdf)](https://github.com/hawkongz/mineru-pdf)
 
   <p><strong>Language:</strong> <a href="../README.md">English</a> | <a href="README.md">简体中文</a></p>
 </div>
@@ -91,12 +91,12 @@ pip install "mineru[pipeline]"
 
 **macOS / Linux：**
 ```bash
-mkdir -p ~/.claude/skills/mineru-pdf && curl -o ~/.claude/skills/mineru-pdf/SKILL.md https://raw.githubusercontent.com/20kiki/mineru-pdf/master/SKILL.md
+mkdir -p ~/.claude/skills/mineru-pdf && curl -o ~/.claude/skills/mineru-pdf/SKILL.md https://raw.githubusercontent.com/hawkongz/mineru-pdf/master/SKILL.md
 ```
 
 **Windows（PowerShell）：**
 ```powershell
-New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\mineru-pdf"; Invoke-WebRequest -Uri "https://raw.githubusercontent.com/20kiki/mineru-pdf/master/SKILL.md" -OutFile "$env:USERPROFILE\.claude\skills\mineru-pdf\SKILL.md"
+New-Item -ItemType Directory -Force -Path "$env:USERPROFILE\.claude\skills\mineru-pdf"; Invoke-WebRequest -Uri "https://raw.githubusercontent.com/hawkongz/mineru-pdf/master/SKILL.md" -OutFile "$env:USERPROFILE\.claude\skills\mineru-pdf\SKILL.md"
 ```
 
 

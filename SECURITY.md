@@ -2,7 +2,7 @@
 
 ## Reporting a Vulnerability
 
-If you discover a security issue in this skill, please report it by [opening an issue](https://github.com/20kiki/mineru-pdf/issues) with the `security` label.
+If you discover a security issue in this skill, please report it by [opening an issue](https://github.com/hawkongz/mineru-pdf/issues) with the `security` label.
 
 **Do not** include sensitive details in public issues. For critical vulnerabilities, contact the maintainer directly via GitHub.
 
